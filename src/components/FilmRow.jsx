@@ -29,7 +29,7 @@ export default function FilmRow({
           {String(index + 1).padStart(2, '0')}
         </span>
 
-        <PosterImage src={film.poster} featured={featured} />
+        <PosterImage src={film.poster} title={film.title} featured={featured} />
 
         <div className="min-w-0">
           <h2

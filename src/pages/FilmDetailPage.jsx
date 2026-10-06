@@ -79,7 +79,7 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
       ) : (
         <div className="space-y-8 lg:flex lg:items-start lg:gap-10 lg:space-y-0">
           <div className="lg:w-64 lg:shrink-0">
-            <PosterHero src={film.poster} />
+            <PosterHero src={film.poster} title={film.title} />
           </div>
 
           <div className="space-y-8 lg:flex-1">
