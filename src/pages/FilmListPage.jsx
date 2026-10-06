@@ -22,9 +22,14 @@ export default function FilmListPage({ films, onSelectFilm, onAddFilm }) {
             <h1 className="font-heading text-[clamp(2.75rem,8vw,4.5rem)] font-semibold leading-[0.95] tracking-tight text-balance text-text">
               Films
             </h1>
-            <div className="flex shrink-0 items-center gap-3 pb-1">
+            <div
+              className={[
+                'flex items-center gap-3 pb-1',
+                searchOpen ? 'w-full sm:w-auto' : 'shrink-0',
+              ].join(' ')}
+            >
               {searchOpen ? (
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 flex-1 items-center gap-2">
                   <label htmlFor="film-search" className="sr-only">
                     Find a title
                   </label>
@@ -35,7 +40,7 @@ export default function FilmListPage({ films, onSelectFilm, onAddFilm }) {
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Find a title…"
                     autoFocus
-                    className="w-36 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm text-text placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30 sm:w-44"
+                    className="min-h-11 min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-base text-text placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30 sm:min-h-0 sm:w-44 sm:flex-none sm:text-sm"
                   />
                   <button
                     type="button"
@@ -59,7 +64,7 @@ export default function FilmListPage({ films, onSelectFilm, onAddFilm }) {
                   Search
                 </button>
               )}
-              <p className="text-sm tabular-nums text-muted">
+              <p className="shrink-0 text-sm tabular-nums text-muted">
                 {isFiltering
                   ? `${filteredFilms.length} of ${films.length}`
                   : `${films.length} titles`}
