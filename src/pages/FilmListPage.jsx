@@ -16,7 +16,7 @@ export default function FilmListPage({ films, onSelectFilm, onAddFilm }) {
 
   return (
     <>
-      <div className="mx-auto min-h-svh max-w-xl px-6 py-10 sm:max-w-2xl sm:px-8 sm:py-14 lg:max-w-4xl lg:px-12 lg:py-16">
+      <div className="mx-auto min-h-svh max-w-xl px-6 pt-10 pb-28 sm:max-w-2xl sm:px-8 sm:pt-14 lg:max-w-4xl lg:px-12 lg:pt-16">
         <header className="mb-12 sm:mb-14">
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <h1 className="font-heading text-[clamp(2.75rem,8vw,4.5rem)] font-semibold leading-[0.95] tracking-tight text-balance text-text">
