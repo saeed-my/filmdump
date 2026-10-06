@@ -1,7 +1,7 @@
 import { useId } from 'react'
 
 const fieldClass =
-  'w-full rounded-md border border-border bg-background px-3 py-2.5 text-base text-text transition-colors duration-200 placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30'
+  'w-full rounded-md border border-border bg-background px-3 py-2.5 text-base text-text transition-colors duration-200 placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30 aria-invalid:border-danger'
 
 const labelClass = 'mb-1.5 block text-sm font-medium text-text'
 
@@ -43,7 +43,7 @@ export default function FilmForm({
           placeholder="Film title"
         />
         {errors.title ? (
-          <p id={`${idPrefix}-title-error`} className="mt-1.5 text-sm text-cta">
+          <p id={`${idPrefix}-title-error`} className="mt-1.5 text-sm text-danger">
             {errors.title}
           </p>
         ) : null}
@@ -74,7 +74,7 @@ export default function FilmForm({
             <span className="shrink-0 text-sm text-muted">/ 10</span>
           </div>
           {errors.rating ? (
-            <p id={`${idPrefix}-rating-error`} className="mt-1.5 text-sm text-cta">
+            <p id={`${idPrefix}-rating-error`} className="mt-1.5 text-sm text-danger">
               {errors.rating}
             </p>
           ) : null}
@@ -97,7 +97,7 @@ export default function FilmForm({
             className={fieldClass}
           />
           {errors.watchedDate ? (
-            <p id={`${idPrefix}-watched-error`} className="mt-1.5 text-sm text-cta">
+            <p id={`${idPrefix}-watched-error`} className="mt-1.5 text-sm text-danger">
               {errors.watchedDate}
             </p>
           ) : null}
@@ -121,7 +121,7 @@ export default function FilmForm({
           placeholder="https://…"
         />
         {errors.poster ? (
-          <p id={`${idPrefix}-poster-error`} className="mt-1.5 text-sm text-cta">
+          <p id={`${idPrefix}-poster-error`} className="mt-1.5 text-sm text-danger">
             {errors.poster}
           </p>
         ) : null}
