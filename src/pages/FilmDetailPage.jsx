@@ -100,7 +100,7 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
               {film.notes ? (
                 <div>
                   <dt className="mb-1 text-sm font-medium text-muted">Notes</dt>
-                  <dd className="text-base leading-relaxed text-pretty text-text">
+                  <dd className="text-base leading-relaxed whitespace-pre-line text-pretty text-text">
                     {film.notes}
                   </dd>
                 </div>
