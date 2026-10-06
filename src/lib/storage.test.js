@@ -12,6 +12,8 @@ describe('normalizeFilm', () => {
       poster: '',
       watchedDate: null,
       notes: '',
+      recommended: false,
+      recommendNote: '',
     })
   })
 })

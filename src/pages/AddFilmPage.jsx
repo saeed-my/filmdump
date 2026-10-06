@@ -9,6 +9,8 @@ const initialValues = () => ({
   poster: '',
   watchedDate: todayIso(),
   notes: '',
+  recommended: false,
+  recommendNote: '',
 })
 
 export default function AddFilmPage({ onBack, onSave }) {

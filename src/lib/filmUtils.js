@@ -25,7 +25,15 @@ export function todayIso() {
   return `${y}-${m}-${d}`
 }
 
-export function validateFilmFields({ title, rating, poster, watchedDate, notes }) {
+export function validateFilmFields({
+  title,
+  rating,
+  poster,
+  watchedDate,
+  notes,
+  recommended,
+  recommendNote,
+}) {
   const errors = {}
   const trimmedTitle = title?.trim() ?? ''
 
@@ -63,8 +71,16 @@ export function validateFilmFields({ title, rating, poster, watchedDate, notes }
       poster: poster?.trim() ?? '',
       watchedDate: watchedDate || null,
       notes: notes?.trim() ?? '',
+      recommended: Boolean(recommended),
+      recommendNote: recommended ? (recommendNote?.trim() ?? '') : '',
     },
   }
+}
+
+export function getRecommended(films) {
+  return films
+    .filter((film) => film.recommended)
+    .sort((a, b) => b.rating - a.rating)
 }
 
 export function filterFilms(films, query) {

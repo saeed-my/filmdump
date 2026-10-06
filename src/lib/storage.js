@@ -11,6 +11,8 @@ export function normalizeFilm(film) {
     poster: film.poster?.trim() ?? '',
     watchedDate: film.watchedDate || null,
     notes: film.notes ?? '',
+    recommended: Boolean(film.recommended),
+    recommendNote: film.recommendNote?.trim() ?? '',
   }
 }
 

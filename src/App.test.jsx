@@ -39,6 +39,53 @@ describe('App', () => {
     expect(stored.at(-1)).toMatchObject({ title: 'Heat', rating: 8.3 })
   })
 
+  it('shows an empty recommendations page until something is recommended', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Recommendations' }))
+    expect(
+      screen.getByRole('heading', { name: 'Recommendations' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Nothing recommended yet.')).toBeInTheDocument()
+  })
+
+  it('puts a recommended film and its note on the recommendations page', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/films/2')
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Edit' }))
+    await user.click(screen.getByLabelText('Recommend to friends'))
+    await user.type(screen.getByLabelText(/Why watch it/), 'Go in blind')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await user.click(await screen.findByRole('link', { name: /Films/ }))
+    expect(screen.getByText(/· Recommended/)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Recommendations' }))
+    expect(screen.getByText('Parasite')).toBeInTheDocument()
+    expect(screen.getByText('Go in blind')).toBeInTheDocument()
+    expect(screen.queryByText('The Godfather')).not.toBeInTheDocument()
+  })
+
+  it('removes a film from recommendations when unticked', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      'filmdump:films',
+      JSON.stringify([
+        { id: 1, title: 'Heat', rating: 8, recommended: true, recommendNote: 'x' },
+      ]),
+    )
+    window.history.pushState(null, '', '/films/1')
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Edit' }))
+    await user.click(screen.getByLabelText('Recommend to friends'))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await screen.findByRole('button', { name: 'Edit' })
+    expect(JSON.parse(localStorage.getItem('filmdump:films'))[0]).toMatchObject({
+      recommended: false,
+      recommendNote: '',
+    })
+  })
+
   it('blocks saving a film with no title or rating', async () => {
     const user = userEvent.setup()
     window.history.pushState(null, '', '/add')

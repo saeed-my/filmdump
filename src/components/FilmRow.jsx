@@ -57,6 +57,9 @@ export default function FilmRow({
               {film.rating.toFixed(1)}
             </span>
             <span className="text-muted"> / 10</span>
+            {film.recommended ? (
+              <span className="text-muted"> · Recommended</span>
+            ) : null}
           </p>
         </div>
       </button>

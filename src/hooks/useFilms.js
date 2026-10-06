@@ -1,10 +1,36 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { films as seedFilms } from '../data/films'
+import { insertFilm, listFilms, updateFilmRow } from '../lib/filmsRepo'
 import { normalizeFilm, getFilms, saveFilms } from '../lib/storage'
+import { isCloud } from '../lib/supabase'
 
-export function useFilms() {
-  const [films, setFilms] = useState(() => getFilms(seedFilms))
+const SAVE_ERROR = "Couldn't save — try again"
+
+export function useFilms(userId) {
+  const [films, setFilms] = useState(() =>
+    isCloud ? [] : getFilms(seedFilms),
+  )
+  const [loading, setLoading] = useState(isCloud)
   const [saveError, setSaveError] = useState(null)
+
+  useEffect(() => {
+    if (!isCloud || !userId) return
+    let cancelled = false
+    listFilms()
+      .then((rows) => {
+        if (cancelled) return
+        setFilms(rows)
+        setLoading(false)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setSaveError("Couldn't load your films — check your connection")
+        setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [userId])
 
   const persist = useCallback((next) => {
     try {
@@ -13,13 +39,24 @@ export function useFilms() {
       setSaveError(null)
       return true
     } catch {
-      setSaveError("Couldn't save — try again")
+      setSaveError(SAVE_ERROR)
       return false
     }
   }, [])
 
   const addFilm = useCallback(
-    (film) => {
+    async (film) => {
+      if (isCloud) {
+        try {
+          const saved = await insertFilm(normalizeFilm(film))
+          setFilms((current) => [...current, saved])
+          setSaveError(null)
+          return saved.id
+        } catch {
+          setSaveError(SAVE_ERROR)
+          return null
+        }
+      }
       const id = Date.now()
       const next = [...films, { ...normalizeFilm(film), id }]
       return persist(next) ? id : null
@@ -28,13 +65,25 @@ export function useFilms() {
   )
 
   const updateFilm = useCallback(
-    (id, updates) => {
-      const next = films.map((film) =>
-        film.id === id
-          ? { ...normalizeFilm({ ...film, ...updates }), id }
-          : film,
-      )
-      return persist(next)
+    async (id, updates) => {
+      const existing = films.find((film) => film.id === id)
+      if (!existing) return false
+      const merged = { ...normalizeFilm({ ...existing, ...updates }), id }
+
+      if (isCloud) {
+        try {
+          const saved = await updateFilmRow(id, merged)
+          setFilms((current) =>
+            current.map((film) => (film.id === id ? saved : film)),
+          )
+          setSaveError(null)
+          return true
+        } catch {
+          setSaveError(SAVE_ERROR)
+          return false
+        }
+      }
+      return persist(films.map((film) => (film.id === id ? merged : film)))
     },
     [films, persist],
   )
@@ -48,6 +97,7 @@ export function useFilms() {
 
   return {
     films,
+    loading,
     saveError,
     clearSaveError,
     addFilm,

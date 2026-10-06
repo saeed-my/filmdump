@@ -142,6 +142,37 @@ export default function FilmForm({
         />
       </div>
 
+      <div>
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium text-text">
+          <input
+            type="checkbox"
+            name="recommended"
+            checked={!!values.recommended}
+            onChange={(event) => onChange('recommended', event.target.checked)}
+            className="h-5 w-5 cursor-pointer accent-cta"
+          />
+          Recommend to friends
+        </label>
+        {values.recommended ? (
+          <div className="mt-2">
+            <label htmlFor={`${idPrefix}-recommend-note`} className={labelClass}>
+              Why watch it{' '}
+              <span className="font-normal text-muted">(optional)</span>
+            </label>
+            <input
+              id={`${idPrefix}-recommend-note`}
+              name="recommendNote"
+              type="text"
+              maxLength={160}
+              value={values.recommendNote ?? ''}
+              onChange={(event) => onChange('recommendNote', event.target.value)}
+              className={fieldClass}
+              placeholder="One line your friends will see"
+            />
+          </div>
+        ) : null}
+      </div>
+
       <div className="flex flex-wrap items-center gap-3 pt-1">
         <button
           type="submit"

@@ -1,16 +1,49 @@
-# React + Vite
+# filmdump
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A personal log of the films and shows you've watched, with ratings and notes, plus a public recommendations page you can send to friends.
 
-Currently, two official plugins are available:
+- `/` is your log. Add a film, rate it out of 10, write what you thought.
+- Tick **Recommend to friends** on any film and add one line on why.
+- `/recs` is the public page. It shows only recommended films, their rating and that one line. Your notes and watch dates never appear there.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run it locally
 
-## React Compiler
+```bash
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+With no setup the app runs in **local mode**: films are saved in this browser only, and `/recs` is visible only on this device.
 
-## Expanding the ESLint configuration
+## Connect sharing (one time, about 10 minutes)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The public page needs a database. This uses Supabase's free tier.
+
+1. Create a project at https://supabase.com.
+2. In **SQL Editor**, paste the contents of `supabase/schema.sql` and run it.
+3. In **Authentication > Users**, click **Add user** and create your own email and password. This is the only account that can edit the log.
+4. In **Authentication > Sign In / Providers**, turn off **Allow new users to sign up**. Skipping this lets strangers create accounts and add films to your public page.
+5. In **Project Settings > API**, copy the Project URL and the `anon` public key into a new `.env.local` file (see `.env.example`).
+6. Restart `npm run dev`. You now see a sign-in page; your log lives in Supabase and follows you across devices.
+
+The log starts empty once connected. Films saved earlier in local mode stay in that browser and are not uploaded.
+
+## Put it online
+
+Any static host works. On Vercel:
+
+1. Import this GitHub repo at https://vercel.com/new.
+2. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` under Environment Variables.
+3. Deploy. Your shareable link is `https://<your-site>/recs`.
+
+`vercel.json` already routes every path to the app. On another host, add the equivalent "serve index.html for all paths" rule.
+
+## Develop
+
+```bash
+npm test        # Vitest + Testing Library
+npm run lint
+npm run build
+```
+
+See `TESTING.md` for test conventions. Stack: React 19, Vite, Tailwind 4, Supabase.

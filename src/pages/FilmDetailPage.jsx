@@ -4,15 +4,19 @@ import FilmForm from '../components/FilmForm'
 import { PosterHero } from '../components/PosterImage'
 import { formatWatchedDate, validateFilmFields } from '../lib/filmUtils'
 
+const toFormValues = (film) => ({
+  title: film.title,
+  rating: String(film.rating),
+  poster: film.poster,
+  watchedDate: film.watchedDate ?? '',
+  notes: film.notes,
+  recommended: film.recommended,
+  recommendNote: film.recommendNote,
+})
+
 export default function FilmDetailPage({ film, onBack, onSave }) {
   const [isEditing, setIsEditing] = useState(false)
-  const [values, setValues] = useState(() => ({
-    title: film.title,
-    rating: String(film.rating),
-    poster: film.poster,
-    watchedDate: film.watchedDate ?? '',
-    notes: film.notes,
-  }))
+  const [values, setValues] = useState(() => toFormValues(film))
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -28,13 +32,7 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
   }
 
   const handleCancel = () => {
-    setValues({
-      title: film.title,
-      rating: String(film.rating),
-      poster: film.poster,
-      watchedDate: film.watchedDate ?? '',
-      notes: film.notes,
-    })
+    setValues(toFormValues(film))
     setErrors({})
     setIsEditing(false)
   }
@@ -102,6 +100,16 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
                   <dt className="mb-1 text-sm font-medium text-muted">Notes</dt>
                   <dd className="text-base leading-relaxed whitespace-pre-line text-pretty text-text">
                     {film.notes}
+                  </dd>
+                </div>
+              ) : null}
+              {film.recommended ? (
+                <div>
+                  <dt className="mb-1 text-sm font-medium text-muted">
+                    Recommended to friends
+                  </dt>
+                  <dd className="text-base leading-relaxed text-pretty text-text">
+                    {film.recommendNote || 'Yes'}
                   </dd>
                 </div>
               ) : null}

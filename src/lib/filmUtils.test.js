@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   filterFilms,
   formatWatchedDate,
+  getRecommended,
   getTopRatedId,
   validateFilmFields,
 } from './filmUtils'
@@ -52,7 +53,30 @@ describe('validateFilmFields', () => {
       poster: 'https://example.com/a.jpg',
       watchedDate: null,
       notes: 'great',
+      recommended: false,
+      recommendNote: '',
     })
+  })
+
+  it('keeps the recommendation note only when recommended', () => {
+    const base = { title: 'A', rating: '7', recommendNote: ' watch it ' }
+    expect(
+      validateFilmFields({ ...base, recommended: true }).values,
+    ).toMatchObject({ recommended: true, recommendNote: 'watch it' })
+    expect(
+      validateFilmFields({ ...base, recommended: false }).values,
+    ).toMatchObject({ recommended: false, recommendNote: '' })
+  })
+})
+
+describe('getRecommended', () => {
+  it('returns only recommended films, best first', () => {
+    const list = [
+      { id: 1, rating: 7, recommended: true },
+      { id: 2, rating: 9, recommended: false },
+      { id: 3, rating: 8.5, recommended: true },
+    ]
+    expect(getRecommended(list).map((film) => film.id)).toEqual([3, 1])
   })
 })
 

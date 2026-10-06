@@ -3,7 +3,16 @@ import FilmRow from '../components/FilmRow'
 import FabAdd from '../components/FabAdd'
 import { filterFilms, getTopRatedId } from '../lib/filmUtils'
 
-export default function FilmListPage({ films, onSelectFilm, onAddFilm }) {
+const headerButtonClass =
+  'flex min-h-11 min-w-11 cursor-pointer items-center justify-center text-sm text-muted transition-colors duration-200 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta'
+
+export default function FilmListPage({
+  films,
+  onSelectFilm,
+  onAddFilm,
+  onOpenRecs,
+  onSignOut,
+}) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -55,14 +64,23 @@ export default function FilmListPage({ films, onSelectFilm, onAddFilm }) {
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setSearchOpen(true)}
-                  aria-label="Search films"
-                  className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center text-sm text-muted transition-colors duration-200 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
-                >
-                  Search
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={onOpenRecs}
+                    className={headerButtonClass}
+                  >
+                    Recommendations
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSearchOpen(true)}
+                    aria-label="Search films"
+                    className={headerButtonClass}
+                  >
+                    Search
+                  </button>
+                </>
               )}
               <p className="shrink-0 text-sm tabular-nums text-muted">
                 {isFiltering
@@ -105,6 +123,14 @@ export default function FilmListPage({ films, onSelectFilm, onAddFilm }) {
             ))}
           </div>
         )}
+
+        {onSignOut ? (
+          <footer className="mt-10 text-center">
+            <button type="button" onClick={onSignOut} className={`mx-auto ${headerButtonClass}`}>
+              Sign out
+            </button>
+          </footer>
+        ) : null}
       </div>
 
       <FabAdd onClick={onAddFilm} />
