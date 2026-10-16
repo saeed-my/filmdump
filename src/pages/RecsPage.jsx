@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import BackLink from '../components/BackLink'
+import NavBar from '../components/NavBar'
+import { useLargeTitle } from '../hooks/useLargeTitle'
 import PosterImage from '../components/PosterImage'
 
 const linkClass =
-  'min-h-11 cursor-pointer text-sm font-medium text-cta transition-opacity duration-200 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta'
+  'press min-h-11 cursor-pointer px-2 text-sm font-medium text-tint hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta'
 
 export default function RecsPage({
   films,
@@ -16,6 +18,7 @@ export default function RecsPage({
   onSignIn,
 }) {
   const [shareStatus, setShareStatus] = useState(null)
+  const [titleRef, collapsed] = useLargeTitle()
   const shareUrl = `${window.location.origin}/recs`
 
   const handleCopy = async () => {
@@ -28,20 +31,27 @@ export default function RecsPage({
   }
 
   return (
-    <div className="mx-auto min-h-svh max-w-xl px-6 py-10 sm:max-w-2xl sm:px-8 sm:py-14 lg:max-w-4xl lg:px-12 lg:py-16">
-      {isOwner ? <BackLink onClick={onBack} /> : null}
-
-      <header className={isOwner ? 'mt-8 mb-10' : 'mb-10'}>
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-          <h1 className="font-heading text-[clamp(2.5rem,8vw,4.5rem)] font-semibold leading-[0.95] tracking-tight text-balance text-text">
-            Recommendations
-          </h1>
-          {isOwner ? (
+    <div className="mx-auto min-h-svh max-w-xl px-6 pb-16 sm:max-w-2xl sm:px-8 lg:max-w-4xl lg:px-12">
+      <NavBar
+        title="Recommendations"
+        collapsed={collapsed}
+        left={isOwner ? <BackLink onClick={onBack} /> : null}
+        right={
+          isOwner ? (
             <button type="button" onClick={handleCopy} className={linkClass}>
               {shareStatus === 'copied' ? 'Link copied' : 'Copy link'}
             </button>
-          ) : null}
-        </div>
+          ) : null
+        }
+      />
+
+      <header className="mt-4 mb-10 sm:mt-6">
+        <h1
+          ref={titleRef}
+          className="font-heading text-[clamp(2.5rem,8vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.02em] text-balance text-text"
+        >
+          Recommendations
+        </h1>
         {isOwner && shareStatus === 'failed' ? (
           <p className="mt-3 text-sm break-all text-muted">
             Copy it by hand: {shareUrl}
@@ -88,7 +98,7 @@ export default function RecsPage({
                   {film.title}
                 </h2>
                 <p className="mt-0.5 text-sm tabular-nums">
-                  <span className="font-semibold text-cta">
+                  <span className="font-semibold text-tint">
                     {film.rating.toFixed(1)}
                   </span>
                   <span className="text-muted"> / 10</span>

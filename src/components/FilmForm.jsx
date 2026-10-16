@@ -1,7 +1,7 @@
 import { useId } from 'react'
 
 const fieldClass =
-  'w-full rounded-md border border-border bg-background px-3 py-2.5 text-base text-text transition-colors duration-200 placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30 aria-invalid:border-danger'
+  'w-full rounded-xl border border-border bg-background px-3 py-2.5 text-base text-text transition-colors duration-200 placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30 aria-invalid:border-danger'
 
 const labelClass = 'mb-1.5 block text-sm font-medium text-text'
 
@@ -143,15 +143,16 @@ export default function FilmForm({
       </div>
 
       <div>
-        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium text-text">
+        <label className="flex min-h-11 cursor-pointer items-center justify-between gap-4 text-base text-text">
+          Recommend to friends
           <input
             type="checkbox"
+            role="switch"
             name="recommended"
             checked={!!values.recommended}
             onChange={(event) => onChange('recommended', event.target.checked)}
-            className="h-5 w-5 cursor-pointer accent-cta"
+            className="switch"
           />
-          Recommend to friends
         </label>
         {values.recommended ? (
           <div className="mt-2">
@@ -177,7 +178,7 @@ export default function FilmForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="min-h-11 cursor-pointer rounded-md bg-cta px-5 py-2.5 text-sm font-semibold text-white transition-opacity duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:cursor-not-allowed disabled:opacity-50"
+          className="press min-h-11 cursor-pointer rounded-xl bg-cta px-6 py-2.5 text-base font-semibold text-white hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? 'Saving…' : submitLabel}
         </button>

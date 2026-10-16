@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
+import { AnimatePresence } from 'motion/react'
 import { useRouter } from './hooks/useRouter'
 import { useFilms } from './hooks/useFilms'
 import { useSession } from './hooks/useSession'
@@ -22,7 +23,7 @@ function NotFoundPage({ onBack }) {
         <button
           type="button"
           onClick={onBack}
-          className="mt-4 cursor-pointer text-sm text-cta transition-opacity duration-200 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
+          className="mt-4 cursor-pointer text-sm text-tint transition-opacity duration-200 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
         >
           Back to Films
         </button>
@@ -66,8 +67,12 @@ export default function App() {
     getFilmById,
   } = useFilms(session?.user.id)
 
+  // Opening or closing the add sheet keeps the list where it was.
+  const previousView = useRef(route.view)
   useEffect(() => {
-    window.scrollTo(0, 0)
+    const viaSheet = previousView.current === 'add' || route.view === 'add'
+    previousView.current = route.view
+    if (!viaSheet) window.scrollTo(0, 0)
   }, [route.view, route.id])
 
   const film = useMemo(() => {
@@ -97,9 +102,10 @@ export default function App() {
     <>
       <StorageErrorBanner message={saveError} onDismiss={clearSaveError} />
 
-      {route.view === 'list' || route.view === 'login' ? (
+      {route.view === 'list' || route.view === 'login' || route.view === 'add' ? (
         <FilmListPage
           films={films}
+          inert={route.view === 'add'}
           onSelectFilm={(id) => navigate(`/films/${id}`)}
           onAddFilm={() => navigate('/add')}
           onOpenRecs={() => navigate('/recs')}
@@ -117,12 +123,15 @@ export default function App() {
         />
       ) : null}
 
-      {route.view === 'add' ? (
-        <AddFilmPage
-          onBack={() => navigate('/')}
-          onSave={(values) => addFilm(values)}
-        />
-      ) : null}
+      <AnimatePresence>
+        {route.view === 'add' ? (
+          <AddFilmPage
+            key="add"
+            onBack={() => navigate('/')}
+            onSave={(values) => addFilm(values)}
+          />
+        ) : null}
+      </AnimatePresence>
 
       {route.view === 'detail' && film ? (
         <FilmDetailPage

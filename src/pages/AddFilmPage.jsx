@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import BackLink from '../components/BackLink'
 import FilmForm from '../components/FilmForm'
+import Sheet from '../components/Sheet'
 import { todayIso, validateFilmFields } from '../lib/filmUtils'
 
 const initialValues = () => ({
@@ -46,15 +46,7 @@ export default function AddFilmPage({ onBack, onSave }) {
   }
 
   return (
-    <div className="mx-auto min-h-svh max-w-xl px-6 py-10 sm:max-w-2xl sm:px-8 sm:py-14 lg:max-w-3xl lg:px-12 lg:py-16">
-      <BackLink onClick={onBack} />
-
-      <header className="mt-8 mb-10">
-        <h1 className="font-heading text-[clamp(2.25rem,7vw,3.5rem)] font-semibold leading-[0.95] tracking-tight text-balance text-text">
-          Log a film
-        </h1>
-      </header>
-
+    <Sheet title="Log a film" onClose={onBack}>
       <FilmForm
         idPrefix="add"
         values={values}
@@ -64,6 +56,6 @@ export default function AddFilmPage({ onBack, onSave }) {
         submitLabel="Save"
         isSubmitting={isSubmitting}
       />
-    </div>
+    </Sheet>
   )
 }

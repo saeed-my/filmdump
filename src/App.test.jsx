@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
@@ -84,6 +84,48 @@ describe('App', () => {
       recommended: false,
       recommendNote: '',
     })
+  })
+
+  it('opens logging as a sheet over the list', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Log a film' }))
+    expect(screen.getByRole('dialog', { name: 'Log a film' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/add')
+    expect(screen.getByText('The Godfather')).toBeInTheDocument()
+  })
+
+  it('closes the sheet with Cancel without saving', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Log a film' }))
+    await user.type(screen.getByLabelText('Title'), 'Unsaved')
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(window.location.pathname).toBe('/')
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
+    expect(screen.getByText('10 titles')).toBeInTheDocument()
+  })
+
+  it('closes the sheet with Escape', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/add')
+    render(<App />)
+    await user.keyboard('{Escape}')
+    expect(window.location.pathname).toBe('/')
+  })
+
+  it('shows Recommend to friends as a switch', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', '/add')
+    render(<App />)
+    const toggle = screen.getByRole('switch', { name: 'Recommend to friends' })
+    expect(toggle).not.toBeChecked()
+    expect(screen.queryByLabelText(/Why watch it/)).not.toBeInTheDocument()
+    await user.click(toggle)
+    expect(toggle).toBeChecked()
+    expect(screen.getByLabelText(/Why watch it/)).toBeInTheDocument()
   })
 
   it('blocks saving a film with no title or rating', async () => {

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import BackLink from '../components/BackLink'
+import NavBar from '../components/NavBar'
+import { useLargeTitle } from '../hooks/useLargeTitle'
 import FilmForm from '../components/FilmForm'
 import { PosterHero } from '../components/PosterImage'
 import { formatWatchedDate, validateFilmFields } from '../lib/filmUtils'
@@ -15,6 +17,7 @@ const toFormValues = (film) => ({
 })
 
 export default function FilmDetailPage({ film, onBack, onSave }) {
+  const [titleRef, collapsed] = useLargeTitle()
   const [isEditing, setIsEditing] = useState(false)
   const [values, setValues] = useState(() => toFormValues(film))
   const [errors, setErrors] = useState({})
@@ -55,11 +58,19 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
   }
 
   return (
-    <div className="mx-auto min-h-svh max-w-xl px-6 py-10 sm:max-w-2xl sm:px-8 sm:py-14 lg:max-w-3xl lg:px-12 lg:py-16">
-      <BackLink onClick={onBack} />
+    <div className="mx-auto min-h-svh max-w-xl px-6 pb-16 sm:max-w-2xl sm:px-8 lg:max-w-3xl lg:px-12">
+      <NavBar
+        title={film.title}
+        collapsed={collapsed}
+        left={<BackLink onClick={onBack} />}
+        right={<span className="w-16" />}
+      />
 
-      <header className="mt-8 mb-10">
-        <h1 className="font-heading text-[clamp(2.25rem,7vw,3.75rem)] font-semibold leading-[0.95] tracking-tight text-balance text-text">
+      <header className="mt-4 mb-10 sm:mt-6">
+        <h1
+          ref={titleRef}
+          className="font-heading text-[clamp(2.25rem,7vw,3.75rem)] font-semibold leading-[0.95] tracking-[-0.02em] text-balance text-text"
+        >
           {film.title}
         </h1>
       </header>
@@ -118,7 +129,7 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="min-h-11 cursor-pointer text-sm font-medium text-cta transition-opacity duration-200 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
+              className="press min-h-11 cursor-pointer text-sm font-medium text-tint hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
             >
               Edit
             </button>
@@ -131,7 +142,7 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
           type="button"
           onClick={handleCancel}
           disabled={isSubmitting}
-          className="mt-4 min-h-11 cursor-pointer text-sm text-muted transition-colors duration-200 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:cursor-not-allowed disabled:opacity-50"
+          className="press mt-4 min-h-11 cursor-pointer text-sm text-muted hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancel
         </button>

@@ -9,7 +9,7 @@ export default function FilmRow({
   return (
     <article
       className={[
-        'film-row group grid items-center gap-x-4 border-b border-border/40 transition-colors duration-200 hover:bg-primary/60 active:bg-primary sm:gap-x-5',
+        'film-row group grid items-center gap-x-4 border-b border-border/40 transition-colors duration-300 hover:bg-primary/60 active:bg-primary active:duration-0 sm:gap-x-5',
         featured
           ? 'grid-cols-[2rem_4rem_1fr] py-5 sm:grid-cols-[2.5rem_4.5rem_1fr] sm:py-6'
           : 'grid-cols-[2rem_3rem_1fr] py-4 sm:grid-cols-[2.5rem_3.25rem_1fr]',
@@ -34,7 +34,7 @@ export default function FilmRow({
         <div className="min-w-0">
           <h2
             className={[
-              'truncate font-medium leading-snug tracking-tight text-text transition-opacity duration-200',
+              'truncate font-medium leading-snug text-text transition-opacity duration-200',
               featured ? 'text-lg sm:text-xl' : 'text-base',
             ].join(' ')}
           >
@@ -51,7 +51,7 @@ export default function FilmRow({
             <span
               className={[
                 'font-semibold',
-                featured ? 'text-cta' : 'text-muted',
+                featured ? 'text-tint' : 'text-muted',
               ].join(' ')}
             >
               {film.rating.toFixed(1)}
