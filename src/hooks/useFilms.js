@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
-import { films as seedFilms } from '../data/films'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { films as seedFilms, retiredSeedPosters } from '../data/films'
+import { usePosterBackfill } from './usePosterBackfill'
 import { insertFilm, listFilms, updateFilmRow } from '../lib/filmsRepo'
 import { normalizeFilm, getFilms, saveFilms } from '../lib/storage'
 import { isCloud } from '../lib/supabase'
@@ -8,10 +9,47 @@ const SAVE_ERROR = "Couldn't save — try again"
 
 export function useFilms(userId) {
   const [films, setFilms] = useState(() =>
-    isCloud ? [] : getFilms(seedFilms),
+    isCloud ? [] : getFilms(seedFilms, retiredSeedPosters),
   )
   const [loading, setLoading] = useState(isCloud)
   const [saveError, setSaveError] = useState(null)
+
+  // Latest films for async work that outlives a render (poster backfill).
+  const filmsRef = useRef(films)
+  useEffect(() => {
+    filmsRef.current = films
+  })
+
+  // Quietly attaches a found poster, unless one was set in the meantime.
+  const applyPoster = useCallback(async (id, poster) => {
+    const film = filmsRef.current.find((item) => item.id === id)
+    if (!film || film.poster) return
+
+    if (isCloud) {
+      try {
+        const saved = await updateFilmRow(id, { ...film, poster })
+        setFilms((current) =>
+          current.map((item) => (item.id === id ? saved : item)),
+        )
+      } catch {
+        // best effort: it is retried next session
+      }
+      return
+    }
+
+    const next = filmsRef.current.map((item) =>
+      item.id === id ? { ...item, poster } : item,
+    )
+    filmsRef.current = next
+    try {
+      saveFilms(next)
+      setFilms(next)
+    } catch {
+      // storage full or blocked; the poster just isn't kept
+    }
+  }, [])
+
+  usePosterBackfill(films, applyPoster)
 
   useEffect(() => {
     if (!isCloud || !userId) return

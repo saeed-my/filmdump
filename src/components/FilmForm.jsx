@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import TitleField from './TitleField'
 
 const fieldClass =
   'w-full rounded-xl border border-border bg-background px-3 py-2.5 text-base text-text transition-colors duration-200 placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30 aria-invalid:border-danger'
@@ -30,17 +31,19 @@ export default function FilmForm({
         <label htmlFor={`${idPrefix}-title`} className={labelClass}>
           Title
         </label>
-        <input
+        <TitleField
           id={`${idPrefix}-title`}
           name="title"
-          type="text"
-          autoComplete="off"
           value={values.title}
-          onChange={(event) => onChange('title', event.target.value)}
+          onChange={(title) => onChange('title', title)}
+          onPick={(item) => {
+            onChange('title', item.title)
+            onChange('poster', item.poster)
+          }}
           aria-invalid={!!errors.title}
           aria-describedby={errors.title ? `${idPrefix}-title-error` : undefined}
           className={fieldClass}
-          placeholder="Film title"
+          placeholder="Film or show title"
         />
         {errors.title ? (
           <p id={`${idPrefix}-title-error`} className="mt-1.5 text-sm text-danger">
@@ -106,20 +109,29 @@ export default function FilmForm({
 
       <div>
         <label htmlFor={`${idPrefix}-poster`} className={labelClass}>
-          Poster URL <span className="font-normal text-muted">(optional)</span>
+          Poster link <span className="font-normal text-muted">(optional)</span>
         </label>
-        <input
-          id={`${idPrefix}-poster`}
-          name="poster"
-          type="url"
-          inputMode="url"
-          value={values.poster}
-          onChange={(event) => onChange('poster', event.target.value)}
-          aria-invalid={!!errors.poster}
-          aria-describedby={errors.poster ? `${idPrefix}-poster-error` : undefined}
-          className={fieldClass}
-          placeholder="https://…"
-        />
+        <div className="flex items-center gap-3">
+          {values.poster ? (
+            <img
+              src={values.poster}
+              alt="Poster preview"
+              className="h-16 w-11 shrink-0 rounded-[3px] bg-secondary object-cover"
+            />
+          ) : null}
+          <input
+            id={`${idPrefix}-poster`}
+            name="poster"
+            type="url"
+            inputMode="url"
+            value={values.poster}
+            onChange={(event) => onChange('poster', event.target.value)}
+            aria-invalid={!!errors.poster}
+            aria-describedby={errors.poster ? `${idPrefix}-poster-error` : undefined}
+            className={fieldClass}
+            placeholder="Found automatically if left empty"
+          />
+        </div>
         {errors.poster ? (
           <p id={`${idPrefix}-poster-error`} className="mt-1.5 text-sm text-danger">
             {errors.poster}
