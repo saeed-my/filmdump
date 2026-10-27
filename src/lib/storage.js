@@ -11,14 +11,20 @@ export function normalizeFilm(film) {
     poster: film.poster?.trim() ?? '',
     watchedDate: film.watchedDate || null,
     notes: film.notes ?? '',
+    recommended: Boolean(film.recommended),
+    recommendNote: film.recommendNote?.trim() ?? '',
   }
 }
 
-export function getFilms(seedFilms) {
+export function getFilms(seedFilms, retiredPosters = new Set()) {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
-      return JSON.parse(raw).map(normalizeFilm)
+      return JSON.parse(raw)
+        .map(normalizeFilm)
+        .map((film) =>
+          retiredPosters.has(film.poster) ? { ...film, poster: '' } : film,
+        )
     }
     const seeded = seedFilms.map(normalizeFilm)
     saveFilms(seeded)

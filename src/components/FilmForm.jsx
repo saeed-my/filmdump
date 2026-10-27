@@ -1,7 +1,8 @@
 import { useId } from 'react'
+import TitleField from './TitleField'
 
 const fieldClass =
-  'w-full rounded-md border border-border bg-background px-3 py-2.5 text-base text-text transition-colors duration-200 placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30'
+  'w-full rounded-xl border border-border bg-background px-3 py-2.5 text-base text-text transition-colors duration-200 placeholder:text-muted focus:border-cta focus:outline-none focus:ring-2 focus:ring-cta/30 aria-invalid:border-danger'
 
 const labelClass = 'mb-1.5 block text-sm font-medium text-text'
 
@@ -30,20 +31,22 @@ export default function FilmForm({
         <label htmlFor={`${idPrefix}-title`} className={labelClass}>
           Title
         </label>
-        <input
+        <TitleField
           id={`${idPrefix}-title`}
           name="title"
-          type="text"
-          autoComplete="off"
           value={values.title}
-          onChange={(event) => onChange('title', event.target.value)}
+          onChange={(title) => onChange('title', title)}
+          onPick={(item) => {
+            onChange('title', item.title)
+            onChange('poster', item.poster)
+          }}
           aria-invalid={!!errors.title}
           aria-describedby={errors.title ? `${idPrefix}-title-error` : undefined}
           className={fieldClass}
-          placeholder="Film title"
+          placeholder="Film or show title"
         />
         {errors.title ? (
-          <p id={`${idPrefix}-title-error`} className="mt-1.5 text-sm text-cta">
+          <p id={`${idPrefix}-title-error`} className="mt-1.5 text-sm text-danger">
             {errors.title}
           </p>
         ) : null}
@@ -74,7 +77,7 @@ export default function FilmForm({
             <span className="shrink-0 text-sm text-muted">/ 10</span>
           </div>
           {errors.rating ? (
-            <p id={`${idPrefix}-rating-error`} className="mt-1.5 text-sm text-cta">
+            <p id={`${idPrefix}-rating-error`} className="mt-1.5 text-sm text-danger">
               {errors.rating}
             </p>
           ) : null}
@@ -97,7 +100,7 @@ export default function FilmForm({
             className={fieldClass}
           />
           {errors.watchedDate ? (
-            <p id={`${idPrefix}-watched-error`} className="mt-1.5 text-sm text-cta">
+            <p id={`${idPrefix}-watched-error`} className="mt-1.5 text-sm text-danger">
               {errors.watchedDate}
             </p>
           ) : null}
@@ -106,22 +109,31 @@ export default function FilmForm({
 
       <div>
         <label htmlFor={`${idPrefix}-poster`} className={labelClass}>
-          Poster URL <span className="font-normal text-muted">(optional)</span>
+          Poster link <span className="font-normal text-muted">(optional)</span>
         </label>
-        <input
-          id={`${idPrefix}-poster`}
-          name="poster"
-          type="url"
-          inputMode="url"
-          value={values.poster}
-          onChange={(event) => onChange('poster', event.target.value)}
-          aria-invalid={!!errors.poster}
-          aria-describedby={errors.poster ? `${idPrefix}-poster-error` : undefined}
-          className={fieldClass}
-          placeholder="https://…"
-        />
+        <div className="flex items-center gap-3">
+          {values.poster ? (
+            <img
+              src={values.poster}
+              alt="Poster preview"
+              className="h-16 w-11 shrink-0 rounded-[3px] bg-secondary object-cover"
+            />
+          ) : null}
+          <input
+            id={`${idPrefix}-poster`}
+            name="poster"
+            type="url"
+            inputMode="url"
+            value={values.poster}
+            onChange={(event) => onChange('poster', event.target.value)}
+            aria-invalid={!!errors.poster}
+            aria-describedby={errors.poster ? `${idPrefix}-poster-error` : undefined}
+            className={fieldClass}
+            placeholder="Found automatically if left empty"
+          />
+        </div>
         {errors.poster ? (
-          <p id={`${idPrefix}-poster-error`} className="mt-1.5 text-sm text-cta">
+          <p id={`${idPrefix}-poster-error`} className="mt-1.5 text-sm text-danger">
             {errors.poster}
           </p>
         ) : null}
@@ -142,11 +154,43 @@ export default function FilmForm({
         />
       </div>
 
+      <div>
+        <label className="flex min-h-11 cursor-pointer items-center justify-between gap-4 text-base text-text">
+          Recommend to friends
+          <input
+            type="checkbox"
+            role="switch"
+            name="recommended"
+            checked={!!values.recommended}
+            onChange={(event) => onChange('recommended', event.target.checked)}
+            className="switch"
+          />
+        </label>
+        {values.recommended ? (
+          <div className="mt-2">
+            <label htmlFor={`${idPrefix}-recommend-note`} className={labelClass}>
+              Why watch it{' '}
+              <span className="font-normal text-muted">(optional)</span>
+            </label>
+            <input
+              id={`${idPrefix}-recommend-note`}
+              name="recommendNote"
+              type="text"
+              maxLength={160}
+              value={values.recommendNote ?? ''}
+              onChange={(event) => onChange('recommendNote', event.target.value)}
+              className={fieldClass}
+              placeholder="One line your friends will see"
+            />
+          </div>
+        ) : null}
+      </div>
+
       <div className="flex flex-wrap items-center gap-3 pt-1">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="min-h-11 cursor-pointer rounded-md bg-cta px-5 py-2.5 text-sm font-semibold text-white transition-opacity duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:cursor-not-allowed disabled:opacity-50"
+          className="press min-h-11 cursor-pointer rounded-xl bg-cta px-6 py-2.5 text-base font-semibold text-white hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? 'Saving…' : submitLabel}
         </button>
