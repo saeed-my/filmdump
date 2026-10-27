@@ -4,8 +4,10 @@ export default function FilmRow({
   film,
   index,
   featured = false,
+  newReplies = 0,
   onSelect,
 }) {
+  const repliesText = newReplies === 1 ? '1 new reply' : `${newReplies} new replies`
   return (
     <article
       className={[
@@ -20,7 +22,7 @@ export default function FilmRow({
         type="button"
         onClick={() => onSelect(film.id)}
         className="contents cursor-pointer text-left focus-visible:outline-none [&:focus-visible>*]:outline [&:focus-visible>*]:outline-2 [&:focus-visible>*]:outline-offset-2 [&:focus-visible>*]:outline-cta"
-        aria-label={`${film.title}, rated ${film.rating} out of 10`}
+        aria-label={`${film.title}, rated ${film.rating} out of 10${newReplies ? `, ${repliesText}` : ''}`}
       >
         <span
           className="text-xs font-medium tabular-nums tracking-wide text-muted transition-opacity duration-200 group-hover:opacity-80"
@@ -59,6 +61,9 @@ export default function FilmRow({
             <span className="text-muted"> / 10</span>
             {film.recommended ? (
               <span className="text-muted"> · Recommended</span>
+            ) : null}
+            {newReplies ? (
+              <span className="font-semibold text-tint"> · {repliesText}</span>
             ) : null}
           </p>
         </div>

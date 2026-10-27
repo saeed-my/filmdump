@@ -41,6 +41,23 @@ describe('App', () => {
     expect(ratings).toContain(8.3)
   })
 
+  it('treats friend links as dead in local mode', async () => {
+    window.history.pushState(null, '', `/f/${'0'.repeat(32)}`)
+    render(<App />)
+    expect(
+      await screen.findByText("This link doesn't work anymore."),
+    ).toBeInTheDocument()
+  })
+
+  it('explains that sending needs sharing connected', () => {
+    window.history.pushState(null, '', '/films/2')
+    render(<App />)
+    expect(screen.getByRole('button', { name: 'Send to a friend' })).toBeDisabled()
+    expect(
+      screen.getByText('Connect sharing to send films (see the README).'),
+    ).toBeInTheDocument()
+  })
+
   it('logs a new film and persists it', async () => {
     const user = userEvent.setup()
     render(<App />)

@@ -28,6 +28,14 @@ The public page needs a database. This uses Supabase's free tier.
 
 The log starts empty once connected. Films saved earlier in local mode stay in that browser and are not uploaded.
 
+## Send a film to a friend
+
+Open a film and tap **Send to a friend**. Type their name, add a note, and send the link however you like (the share sheet opens on phones). Each friend gets one private link, `/f/<code>`, that collects every film you send them. They can answer each one with **Watched it**, **Seen it before** or **Not for me**, plus a score and one line, without signing in. Their answers show under the film, and the list marks films with new replies.
+
+Needs sharing connected. If you connected sharing before this feature existed, run the friends/sends part of `supabase/schema.sql` once more in the SQL editor. Set `VITE_OWNER_NAME` so friends see who the picks are from.
+
+Anyone holding a friend's link can see that friend's picks and answer as them, so share it only with them. To check that strangers can't read your data, run these in the SQL editor after `set role anon;` (then `reset role;`): `select * from friends;`, `select * from sends;` and `select * from films;` should all fail with "permission denied", and `select get_friend_page('00000000000000000000000000000000');` should return null.
+
 ## Put it online
 
 Any static host works. On Vercel:

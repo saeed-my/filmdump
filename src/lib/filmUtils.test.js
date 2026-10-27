@@ -6,6 +6,8 @@ import {
   getTopRatedId,
   sortByRating,
   validateFilmFields,
+  validateReply,
+  validateSendFields,
 } from './filmUtils'
 
 const films = [
@@ -78,6 +80,63 @@ describe('getRecommended', () => {
       { id: 3, rating: 8.5, recommended: true },
     ]
     expect(getRecommended(list).map((film) => film.id)).toEqual([3, 1])
+  })
+})
+
+describe('validateSendFields', () => {
+  it('needs a name and trims what it keeps', () => {
+    expect(validateSendFields({ name: '  ', note: '' }).errors.name).toBe(
+      'Who is it for?',
+    )
+    expect(validateSendFields({ name: ' Amina ', note: ' go ' })).toEqual({
+      errors: {},
+      values: { name: 'Amina', note: 'go' },
+    })
+  })
+
+  it('caps the name and the note', () => {
+    const { errors } = validateSendFields({
+      name: 'a'.repeat(61),
+      note: 'b'.repeat(281),
+    })
+    expect(errors.name).toBe('Keep the name under 60 characters.')
+    expect(errors.note).toBe('Keep the note under 280 characters.')
+  })
+})
+
+describe('validateReply', () => {
+  it('needs a score for Watched it', () => {
+    const { errors } = validateReply({ status: 'watched', rating: '', line: '' })
+    expect(errors.rating).toBe('Give it a score.')
+  })
+
+  it('accepts Seen it before with or without a score', () => {
+    expect(
+      validateReply({ status: 'seen', rating: '', line: '' }).values.rating,
+    ).toBeNull()
+    expect(
+      validateReply({ status: 'seen', rating: '7.94', line: '' }).values.rating,
+    ).toBe(7.9)
+  })
+
+  it('never keeps a score for Not for me', () => {
+    const { errors, values } = validateReply({
+      status: 'pass',
+      rating: '9',
+      line: ' nah ',
+    })
+    expect(errors).toEqual({})
+    expect(values).toEqual({ status: 'pass', rating: null, line: 'nah' })
+  })
+
+  it('rejects scores outside 0 to 10 and long lines', () => {
+    const { errors } = validateReply({
+      status: 'watched',
+      rating: '11',
+      line: 'x'.repeat(281),
+    })
+    expect(errors.rating).toBe('Score must be between 0 and 10.')
+    expect(errors.line).toBe('Keep it under 280 characters.')
   })
 })
 

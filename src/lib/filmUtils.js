@@ -86,6 +86,51 @@ export function getRecommended(films) {
   return sortByRating(films.filter((film) => film.recommended))
 }
 
+export const REPLY_LABELS = {
+  watched: 'Watched it',
+  seen: 'Seen it before',
+  pass: 'Not for me',
+}
+
+export function validateSendFields({ name, note }) {
+  const errors = {}
+  const trimmedName = name?.trim() ?? ''
+  if (!trimmedName) {
+    errors.name = 'Who is it for?'
+  } else if (trimmedName.length > 60) {
+    errors.name = 'Keep the name under 60 characters.'
+  }
+  const trimmedNote = note?.trim() ?? ''
+  if (trimmedNote.length > 280) {
+    errors.note = 'Keep the note under 280 characters.'
+  }
+  return { errors, values: { name: trimmedName, note: trimmedNote } }
+}
+
+// Watched needs a score, Not for me never has one, Seen it before may.
+export function validateReply({ status, rating, line }) {
+  const errors = {}
+  const trimmedLine = line?.trim() ?? ''
+  let score = null
+
+  if (status !== 'pass' && rating !== '' && rating != null) {
+    score = parseFloat(rating)
+    if (Number.isNaN(score) || score < 0 || score > 10) {
+      errors.rating = 'Score must be between 0 and 10.'
+    } else {
+      score = Math.round(score * 10) / 10
+    }
+  }
+  if (status === 'watched' && score === null && !errors.rating) {
+    errors.rating = 'Give it a score.'
+  }
+  if (trimmedLine.length > 280) {
+    errors.line = 'Keep it under 280 characters.'
+  }
+
+  return { errors, values: { status, rating: score, line: trimmedLine } }
+}
+
 export function filterFilms(films, query) {
   const q = query.trim().toLowerCase()
   if (!q) return films

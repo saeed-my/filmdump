@@ -1,9 +1,12 @@
 import { useState } from 'react'
+import { AnimatePresence } from 'motion/react'
 import BackLink from '../components/BackLink'
 import NavBar from '../components/NavBar'
 import { useLargeTitle } from '../hooks/useLargeTitle'
 import FilmForm from '../components/FilmForm'
 import { PosterHero } from '../components/PosterImage'
+import SendSheet from '../components/SendSheet'
+import SentTo from '../components/SentTo'
 import { formatWatchedDate, validateFilmFields } from '../lib/filmUtils'
 
 const toFormValues = (film) => ({
@@ -16,9 +19,17 @@ const toFormValues = (film) => ({
   recommendNote: film.recommendNote,
 })
 
-export default function FilmDetailPage({ film, onBack, onSave }) {
+export default function FilmDetailPage({
+  film,
+  onBack,
+  onSave,
+  canSend = false,
+  onViewed,
+}) {
   const [titleRef, collapsed] = useLargeTitle()
   const [isEditing, setIsEditing] = useState(false)
+  const [isSending, setIsSending] = useState(false)
+  const [sentCount, setSentCount] = useState(0)
   const [values, setValues] = useState(() => toFormValues(film))
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -126,16 +137,47 @@ export default function FilmDetailPage({ film, onBack, onSave }) {
               ) : null}
             </dl>
 
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className="press min-h-11 cursor-pointer text-sm font-medium text-tint hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
-            >
-              Edit
-            </button>
+            <div className="flex flex-wrap items-center gap-x-6">
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="press min-h-11 cursor-pointer text-sm font-medium text-tint hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSending(true)}
+                disabled={!canSend}
+                aria-describedby={canSend ? undefined : 'send-needs-sharing'}
+                className="press min-h-11 cursor-pointer text-sm font-medium text-tint hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Send to a friend
+              </button>
+            </div>
+            {canSend ? null : (
+              <p id="send-needs-sharing" className="-mt-6 text-sm text-muted">
+                Connect sharing to send films (see the README).
+              </p>
+            )}
+
+            {canSend ? (
+              <SentTo filmId={film.id} refreshKey={sentCount} onViewed={onViewed} />
+            ) : null}
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {isSending ? (
+          <SendSheet
+            key="send"
+            film={film}
+            onClose={() => setIsSending(false)}
+            onSent={() => setSentCount((count) => count + 1)}
+          />
+        ) : null}
+      </AnimatePresence>
 
       {isEditing ? (
         <button

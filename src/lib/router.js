@@ -6,6 +6,8 @@ export function parseRoute(pathname) {
   if (path === '/login') return { view: 'login' }
   const detailMatch = path.match(/^\/films\/(\d+)$/)
   if (detailMatch) return { view: 'detail', id: Number(detailMatch[1]) }
+  const friendMatch = path.match(/^\/f\/([0-9a-f]{32})$/)
+  if (friendMatch) return { view: 'friend', token: friendMatch[1] }
   return { view: 'not-found' }
 }
 

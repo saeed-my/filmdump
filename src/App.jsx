@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { AnimatePresence } from 'motion/react'
 import { useRouter } from './hooks/useRouter'
 import { useFilms } from './hooks/useFilms'
+import { useNewReplies } from './hooks/useNewReplies'
 import { useSession } from './hooks/useSession'
 import { getRecommended } from './lib/filmUtils'
 import { isCloud, supabase } from './lib/supabase'
@@ -12,6 +13,7 @@ import StorageErrorBanner from './components/StorageErrorBanner'
 import FilmListPage from './pages/FilmListPage'
 import FilmDetailPage from './pages/FilmDetailPage'
 import AddFilmPage from './pages/AddFilmPage'
+import FriendPicksPage from './pages/FriendPicksPage'
 import BackLink from './components/BackLink'
 
 function NotFoundPage({ onBack }) {
@@ -66,6 +68,7 @@ export default function App() {
     updateFilm,
     getFilmById,
   } = useFilms(session?.user.id)
+  const { counts: newReplies, markSeen } = useNewReplies(session?.user.id)
 
   // Opening or closing the add sheet keeps the list where it was.
   const previousView = useRef(route.view)
@@ -83,6 +86,12 @@ export default function App() {
   const recommended = useMemo(() => getRecommended(films), [films])
 
   if (isCloud && sessionLoading) return <LoadingPage />
+
+  // A friend's link opens their page for anyone holding it, before the
+  // sign-in gate. Signed in, it's the owner checking it: read-only.
+  if (route.view === 'friend') {
+    return <FriendPicksPage token={route.token} preview={Boolean(session)} />
+  }
 
   // Signed-out visitors only ever see the public recommendations.
   if (isCloud && !session) {
@@ -105,6 +114,7 @@ export default function App() {
       {route.view === 'list' || route.view === 'login' || route.view === 'add' ? (
         <FilmListPage
           films={films}
+          newReplies={newReplies}
           inert={route.view === 'add'}
           onSelectFilm={(id) => navigate(`/films/${id}`)}
           onAddFilm={() => navigate('/add')}
@@ -139,6 +149,8 @@ export default function App() {
           film={film}
           onBack={() => navigate('/')}
           onSave={(id, values) => updateFilm(id, values)}
+          canSend={isCloud}
+          onViewed={markSeen}
         />
       ) : null}
 

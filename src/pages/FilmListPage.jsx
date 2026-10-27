@@ -10,6 +10,7 @@ const barButtonClass =
 
 export default function FilmListPage({
   films,
+  newReplies = {},
   inert = false,
   onSelectFilm,
   onAddFilm,
@@ -123,6 +124,7 @@ export default function FilmListPage({
                   film={film}
                   index={index}
                   featured={film.id === topRatedId && !isFiltering}
+                  newReplies={newReplies[film.id] ?? 0}
                   onSelect={onSelectFilm}
                 />
               </div>

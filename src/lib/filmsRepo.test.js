@@ -62,4 +62,24 @@ describe('parseRoute', () => {
     expect(parseRoute('/films/12')).toEqual({ view: 'detail', id: 12 })
     expect(parseRoute('/nope')).toEqual({ view: 'not-found' })
   })
+
+  it('recognises a friend link with a 32 character code', () => {
+    const token = 'a'.repeat(32)
+    expect(parseRoute(`/f/${token}`)).toEqual({ view: 'friend', token })
+    expect(parseRoute(`/f/${token}/`)).toEqual({ view: 'friend', token })
+  })
+
+  it.each([
+    '/f',
+    '/f/',
+    '/f/xyz',
+    `/f/${'a'.repeat(31)}`,
+    `/f/${'a'.repeat(33)}`,
+    `/f/${'A'.repeat(32)}`,
+    `/f/${'g'.repeat(32)}`,
+    `/f/${'a'.repeat(32)}/extra`,
+    `/films/${'a'.repeat(32)}`,
+  ])('does not treat %s as a friend link', (path) => {
+    expect(parseRoute(path).view).not.toBe('friend')
+  })
 })
