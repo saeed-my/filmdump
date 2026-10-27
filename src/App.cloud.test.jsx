@@ -88,7 +88,7 @@ beforeEach(() => {
     Promise.resolve(
       name === 'get_friend_page'
         ? { data: friendPage(), error: null }
-        : { data: null, error: null },
+        : { data: true, error: null },
     ),
   )
   cloud.tables = {
@@ -262,6 +262,43 @@ describe('A friend opening their link', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save. Try again.")
     expect(screen.getByLabelText('One line (optional)')).toHaveValue('Loved it')
+  })
+
+  it('says the pick is gone when the server finds nothing to update', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', `/f/${token}`)
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Seen it before' }))
+    cloud.rpc = vi.fn(() => Promise.resolve({ data: false, error: null }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save. Try again.")
+  })
+
+  it('asks the friend to wait when replies are rate limited', async () => {
+    const user = userEvent.setup()
+    window.history.pushState(null, '', `/f/${token}`)
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Seen it before' }))
+    cloud.rpc = vi.fn(() =>
+      Promise.resolve({ data: null, error: { code: 'PT429', message: 'rate limit exceeded' } }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Too many tries. Wait a few minutes.',
+    )
+  })
+
+  it('asks the friend to wait when loading is rate limited', async () => {
+    cloud.rpc = vi.fn(() =>
+      Promise.resolve({ data: null, error: { code: 'PT429', message: 'rate limit exceeded' } }),
+    )
+    window.history.pushState(null, '', `/f/${token}`)
+    render(<App />)
+    expect(
+      await screen.findByText('Too many tries. Wait a few minutes and reload.'),
+    ).toBeInTheDocument()
   })
 
   it('is read-only when the owner previews it', async () => {

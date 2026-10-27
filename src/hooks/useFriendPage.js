@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getFriendPage, respondToSend } from '../lib/sendsRepo'
+import { getFriendPage, isRateLimited, respondToSend } from '../lib/sendsRepo'
 import { isCloud } from '../lib/supabase'
 
 export function useFriendPage(token) {
@@ -17,12 +17,14 @@ export function useFriendPage(token) {
       .then((page) => {
         if (!cancelled) setState({ page, loading: false, error: null })
       })
-      .catch(() => {
+      .catch((err) => {
         if (!cancelled) {
           setState({
             page: null,
             loading: false,
-            error: "Couldn't load your picks. Check your connection and reload.",
+            error: isRateLimited(err)
+              ? 'Too many tries. Wait a few minutes and reload.'
+              : "Couldn't load your picks. Check your connection and reload.",
           })
         }
       })
