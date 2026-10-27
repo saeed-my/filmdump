@@ -3,7 +3,7 @@ import FilmRow from '../components/FilmRow'
 import FabAdd from '../components/FabAdd'
 import NavBar from '../components/NavBar'
 import { useLargeTitle } from '../hooks/useLargeTitle'
-import { filterFilms, getTopRatedId } from '../lib/filmUtils'
+import { filterFilms, getTopRatedId, sortByRating } from '../lib/filmUtils'
 
 const barButtonClass =
   'press flex min-h-11 min-w-11 cursor-pointer items-center justify-center px-2 text-[0.9375rem] text-tint focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta'
@@ -21,7 +21,7 @@ export default function FilmListPage({
   const [titleRef, collapsed] = useLargeTitle()
 
   const filteredFilms = useMemo(
-    () => filterFilms(films, searchQuery),
+    () => sortByRating(filterFilms(films, searchQuery)),
     [films, searchQuery],
   )
   const topRatedId = getTopRatedId(films)

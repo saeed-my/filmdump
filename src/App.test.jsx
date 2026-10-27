@@ -25,6 +25,22 @@ describe('App', () => {
     expect(screen.getByText('1 of 10')).toBeInTheDocument()
   })
 
+  it('orders the list by rating, highest first', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Log a film' }))
+    await user.type(screen.getByLabelText('Title'), 'Heat')
+    await user.type(screen.getByLabelText('Rating'), '8.3')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await screen.findByText('Heat')
+
+    const ratings = screen
+      .getAllByRole('button', { name: /rated .* out of 10/ })
+      .map((button) => parseFloat(button.getAttribute('aria-label').match(/rated (\S+) out/)[1]))
+    expect(ratings).toEqual([...ratings].sort((a, b) => b - a))
+    expect(ratings).toContain(8.3)
+  })
+
   it('logs a new film and persists it', async () => {
     const user = userEvent.setup()
     render(<App />)

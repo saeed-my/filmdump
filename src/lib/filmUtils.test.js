@@ -4,6 +4,7 @@ import {
   formatWatchedDate,
   getRecommended,
   getTopRatedId,
+  sortByRating,
   validateFilmFields,
 } from './filmUtils'
 
@@ -77,6 +78,35 @@ describe('getRecommended', () => {
       { id: 3, rating: 8.5, recommended: true },
     ]
     expect(getRecommended(list).map((film) => film.id)).toEqual([3, 1])
+  })
+})
+
+describe('sortByRating', () => {
+  it('orders films from highest to lowest rating', () => {
+    const list = [
+      { id: 1, rating: 7.4 },
+      { id: 2, rating: 9.2 },
+      { id: 3, rating: 8.1 },
+    ]
+    expect(sortByRating(list).map((film) => film.id)).toEqual([2, 3, 1])
+  })
+
+  it('keeps the existing order for tied ratings', () => {
+    const list = [
+      { id: 1, rating: 8 },
+      { id: 2, rating: 9 },
+      { id: 3, rating: 8 },
+    ]
+    expect(sortByRating(list).map((film) => film.id)).toEqual([2, 1, 3])
+  })
+
+  it('does not mutate the input', () => {
+    const list = [
+      { id: 1, rating: 7 },
+      { id: 2, rating: 9 },
+    ]
+    sortByRating(list)
+    expect(list.map((film) => film.id)).toEqual([1, 2])
   })
 })
 

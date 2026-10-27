@@ -77,10 +77,13 @@ export function validateFilmFields({
   }
 }
 
+// Highest rating first; ties keep their existing order.
+export function sortByRating(films) {
+  return [...films].sort((a, b) => b.rating - a.rating)
+}
+
 export function getRecommended(films) {
-  return films
-    .filter((film) => film.recommended)
-    .sort((a, b) => b.rating - a.rating)
+  return sortByRating(films.filter((film) => film.recommended))
 }
 
 export function filterFilms(films, query) {
