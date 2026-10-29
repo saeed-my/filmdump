@@ -4,6 +4,7 @@ import PosterImage from '../components/PosterImage'
 import { useFriendPage } from '../hooks/useFriendPage'
 import { useLargeTitle } from '../hooks/useLargeTitle'
 import { REPLY_LABELS, validateReply } from '../lib/filmUtils'
+import { isRateLimited } from '../lib/sendsRepo'
 
 const ownerName = import.meta.env.VITE_OWNER_NAME?.trim() ?? ''
 
@@ -37,8 +38,10 @@ function ReplyForm({ pick, status, onSave, onCancel }) {
     setSaveError(null)
     try {
       await onSave(values)
-    } catch {
-      setSaveError("Couldn't save. Try again.")
+    } catch (err) {
+      setSaveError(
+        isRateLimited(err) ? 'Too many tries. Wait a few minutes.' : "Couldn't save. Try again.",
+      )
       setIsSaving(false)
     }
   }

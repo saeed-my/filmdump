@@ -4,6 +4,7 @@ import {
   deliverLink,
   fromPickRow,
   fromSendRow,
+  isRateLimited,
   makeToken,
   sameName,
 } from './sendsRepo'
@@ -117,5 +118,14 @@ describe('row mapping', () => {
       2: 2,
       7: 1,
     })
+  })
+})
+
+describe('isRateLimited', () => {
+  it('spots the database rate-limit code and nothing else', () => {
+    expect(isRateLimited({ code: 'PT429' })).toBe(true)
+    expect(isRateLimited({ code: 'P0001' })).toBe(false)
+    expect(isRateLimited(new Error('offline'))).toBe(false)
+    expect(isRateLimited(undefined)).toBe(false)
   })
 })

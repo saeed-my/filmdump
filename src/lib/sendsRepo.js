@@ -135,7 +135,7 @@ export async function getFriendPage(token) {
 }
 
 export async function respondToSend(token, sendId, { status, rating, line }) {
-  const { error } = await supabase.rpc('respond_to_send', {
+  const { data, error } = await supabase.rpc('respond_to_send', {
     p_token: token,
     p_send_id: sendId,
     p_status: status,
@@ -143,4 +143,10 @@ export async function respondToSend(token, sendId, { status, rating, line }) {
     p_line: line,
   })
   if (error) throw error
+  if (data === false) throw new Error('pick not found')
+}
+
+// The database raises PT429 when a link or IP sends too many requests.
+export function isRateLimited(error) {
+  return error?.code === 'PT429'
 }
