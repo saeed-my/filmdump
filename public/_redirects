@@ -1,0 +1,2 @@
+# Single-page app: every path, like /recs and /f/<token>, loads index.html.
+/*  /index.html  200
